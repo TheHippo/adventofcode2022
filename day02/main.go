@@ -15,6 +15,42 @@ const (
 	Scissors
 )
 
+type Outcome uint8
+
+const (
+	_ Outcome = iota
+	Lose
+	Draw
+	Win
+)
+
+func parseOutcome(s rune) Outcome {
+	switch s {
+	case 'X':
+		return Lose
+	case 'Y':
+		return Draw
+	case 'Z':
+		return Win
+	default:
+		log.Fatalf("Unknown play: %v", s)
+	}
+	return 0
+}
+
+func (p Outcome) String() string {
+	switch p {
+	case Lose:
+		return "Lose"
+	case Draw:
+		return "Draw"
+	case Win:
+		return "Win"
+	default:
+		return "unknown"
+	}
+}
+
 func (p Play) String() string {
 	switch p {
 	case Rock:
@@ -30,16 +66,34 @@ func (p Play) String() string {
 
 func parsePlay(s rune) Play {
 	switch s {
-	case 'A', 'X':
+	case 'A':
 		return Rock
-	case 'B', 'Y':
+	case 'B':
 		return Paper
-	case 'C', 'Z':
+	case 'C':
 		return Scissors
 	default:
 		log.Fatalf("Unknown play: %v", s)
 	}
 	return 0
+}
+
+func choose(opponent Play, outcome Outcome) (result Play) {
+	switch outcome {
+	case Draw:
+		result = opponent
+	case Win:
+		result = opponent + 1
+		if result == 4 {
+			result = 1
+		}
+	case Lose:
+		result = opponent - 1
+		if result == 0 {
+			result = 3
+		}
+	}
+	return
 }
 
 func getScore(opponent, you Play) (result int) {
@@ -77,7 +131,8 @@ func main() {
 		if len(line) != 3 {
 			log.Fatal("Wrong line lenghth")
 		}
-		opponentPlay, yourPlay := parsePlay(line[0]), parsePlay(line[2])
+		opponentPlay, result := parsePlay(line[0]), parseOutcome(line[2])
+		yourPlay := choose(opponentPlay, result)
 		total += getScore(opponentPlay, yourPlay)
 	}
 	log.Println(total)
