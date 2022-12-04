@@ -26,13 +26,13 @@ func Put(c []byte, i byte) []byte {
 	return c
 }
 
-type Rucksack struct {
-	compartments [2][]byte
+type Group struct {
+	rucksacks [3][]byte
 }
 
-func (r Rucksack) findCommon() (result int) {
-	for _, v := range r.compartments[0] {
-		if bytes.IndexByte(r.compartments[1], v) != -1 {
+func (r Group) findCommon() (result int) {
+	for _, v := range r.rucksacks[0] {
+		if bytes.IndexByte(r.rucksacks[1], v) != -1 && bytes.IndexByte(r.rucksacks[2], v) != -1 {
 			result = +Value(v)
 		}
 	}
@@ -48,8 +48,13 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 
-	rucksacks := make([]*Rucksack, 0)
+	groups := make([]*Group, 0)
 
+	group := &Group{
+		rucksacks: [3][]byte{},
+	}
+
+	count := 0
 	for scanner.Scan() {
 		line := scanner.Text()
 		size := len(line)
@@ -57,31 +62,30 @@ func main() {
 			log.Fatal("line does not contain even number of items")
 		}
 		c := []byte{}
-		rucksack := &Rucksack{
-			compartments: [2][]byte{nil, nil},
-		}
-
 		for i := 0; i < size; i++ {
-			if i == 0 || i == (size/2) {
-				if i != 0 {
-					rucksack.compartments[0] = c
-				}
-				c = []byte{}
-			}
 			c = Put(c, line[i])
 		}
-		rucksack.compartments[1] = c
-		rucksacks = append(rucksacks, rucksack)
-	}
+		group.rucksacks[count%3] = c
 
-	var result int
-	for _, r := range rucksacks {
-		result += r.findCommon()
+		count++
+		if count%3 == 0 && count != 0 {
+			groups = append(groups, group)
+			group = &Group{
+				rucksacks: [3][]byte{},
+			}
+		}
+
 	}
-	log.Println(result)
+	groups = append(groups, group)
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
+
+	var result int
+	for _, r := range groups {
+		result += r.findCommon()
+	}
+	log.Println(result)
 
 }
