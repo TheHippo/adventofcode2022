@@ -73,9 +73,9 @@ func main() {
 		}
 		var moving []byte
 		moving, state.stacks[from] = state.stacks[from][len(state.stacks[from])-count:], state.stacks[from][:len(state.stacks[from])-count]
-		for left, right := 0, len(moving)-1; left < right; left, right = left+1, right-1 {
-			moving[left], moving[right] = moving[right], moving[left]
-		}
+		// for left, right := 0, len(moving)-1; left < right; left, right = left+1, right-1 {
+		// 	moving[left], moving[right] = moving[right], moving[left]
+		// }
 		state.stacks[to] = append(state.stacks[to], moving...)
 	}
 
