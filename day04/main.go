@@ -25,10 +25,10 @@ func parse(s string) int {
 }
 
 func within(e1s, e1e, e2s, e2e int) bool {
-	if e1s >= e2s && e1e <= e2e {
+	if e1e >= e2s && e1s <= e2e {
 		return true
 	}
-	if e2s >= e1s && e2e <= e1e {
+	if e2e >= e1s && e2s <= e1e {
 		return true
 	}
 	return false
