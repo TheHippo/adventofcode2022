@@ -47,8 +47,8 @@ func (r *Ring) String() string {
 }
 
 func getStart(line string) (result int) {
-	ring := newRing(4, line)
-	result = 4
+	ring := newRing(14, line)
+	result = 14
 	for {
 		if ring.allDifferent() {
 			return
