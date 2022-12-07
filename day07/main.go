@@ -179,15 +179,27 @@ func main() {
 
 	absRoot.print(os.Stdout, 0)
 
-	var total uint
+	const fileSystemSize = 70000000
+	const requiredForUpdate = 30000000
+
+	log.Printf("Used: %d", root.size())
+	log.Printf("Unused: %d", fileSystemSize-root.size())
+	needToFree := requiredForUpdate - (fileSystemSize - root.size())
+	log.Printf("Need to free: %d", needToFree)
+
+	var freeName string
+	var freeSize uint
 	root.walk(func(name string, t *Tree) {
-		if t.size() <= 100000 {
-			log.Printf("%s - %d", name, t.size())
-			total += t.size()
+		s := t.size()
+		if s > needToFree {
+			if freeSize == 0 || freeSize > s {
+				freeName = name
+				freeSize = s
+			}
 		}
 	})
 
-	log.Println(total)
+	log.Printf("Free %s %d", freeName, freeSize)
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
