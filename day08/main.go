@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 type Tree struct {
@@ -53,38 +55,33 @@ func (w *Wood) rotate() {
 func (w *Wood) scan() {
 	for y := 0; y < w.size; y++ {
 		minHeight := -1
-		idx := 0
 		for x := 0; x < w.size; x++ {
 			if w.trees[x][y].height > minHeight {
 				minHeight = w.trees[x][y].height
-				idx = x
-				// w.trees[x][y].visible = true
+				w.trees[x][y].visible = true
 			}
-		}
-		for x := idx; x < w.size; x++ {
-			w.trees[x][y].visible = true
 		}
 	}
 }
 
 func (w *Wood) calculate() {
 	for i := 0; i < 4; i++ {
-		w.print()
 		w.scan()
-		w.print()
 		w.rotate()
 	}
 	w.print()
 }
 
 func (w *Wood) print() {
+	visible := color.New(color.FgRed).SprintFunc()
+	invisible := color.New(color.FgGreen).SprintFunc()
 	for y := 0; y < w.size; y++ {
 		b := strings.Builder{}
 		for x := 0; x < w.size; x++ {
 			if !w.trees[x][y].visible {
-				b.WriteString(fmt.Sprintf("%d", w.trees[x][y].height))
+				b.WriteString(visible(fmt.Sprintf("%d", w.trees[x][y].height)))
 			} else {
-				b.WriteString(fmt.Sprintf("x")) // w.trees[x][y].height
+				b.WriteString(invisible(fmt.Sprintf("%d", w.trees[x][y].height)))
 			}
 		}
 		log.Println(b.String())
@@ -93,9 +90,9 @@ func (w *Wood) print() {
 }
 
 func (w *Wood) getVisibleCount() (result int) {
-	for i := 0; i < w.size; i++ {
-		for j := 0; j < i; j++ {
-			if w.trees[i][j].visible {
+	for x := 0; x < w.size; x++ {
+		for y := 0; y < w.size; y++ {
+			if w.trees[x][y].visible {
 				result++
 			}
 		}
@@ -123,10 +120,16 @@ func main() {
 	var wood *Wood
 
 	y := 0
+	size := 0
 	for scanner.Scan() {
 		line := scanner.Text()
+
 		if wood == nil {
-			wood = newWood(len(line))
+			size = len(line)
+			wood = newWood(size)
+		}
+		if len(line) != size {
+			log.Fatalf("Different line length: %d", y+1)
 		}
 		for x := 0; x < len(line); x++ {
 			wood.trees[x][y].height = parseInt([]byte{line[x]})
