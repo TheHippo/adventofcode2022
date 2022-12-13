@@ -64,4 +64,18 @@ func main() {
 	}
 	log.Println(sum)
 
+	str := ""
+	for i := 0; i < len(m.History); i++ {
+		var spriteStart, spriteEnd = (i%40 - 1), (i%40 + 1)
+		if spriteStart <= m.History[i] && m.History[i] <= spriteEnd {
+			str += "#"
+		} else {
+			str += "."
+		}
+		if (i+1)%40 == 0 {
+			log.Println(str)
+			str = ""
+		}
+	}
+
 }
