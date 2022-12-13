@@ -1,0 +1,7 @@
+-main Main
+--resource input.txt@input
+# --debug
+# --neko day12.n
+# --cpp bin/cpp
+# --java bin/java
+# --cs bin/cs
