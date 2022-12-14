@@ -17,7 +17,7 @@ enum Operator {
 
 typedef Throw = {
     to: Int,
-    worry: Int,
+    worry: UInt,
 }
 
 enum TestResult {
@@ -27,14 +27,14 @@ enum TestResult {
 
 class Monkey {
     public var index:Int;
-    public var items:Array<Int>;
+    public var items:Array<UInt>;
     public var worryOperation:Operation;
     public var worryOperator:Operator;
     public var test:Int;
     public var throwTo:haxe.ds.Map<TestResult,Int>;
     public var inspections:Int = 0;
 
-    public function new(idx:Int, items:Array<Int>, worryOperation:Operation, worryOperator:Operator, test:Int, trueMonkey, falseMonkey:Int) {
+    public function new(idx:Int, items:Array<UInt>, worryOperation:Operation, worryOperator:Operator, test:Int, trueMonkey, falseMonkey:Int) {
         this.index = idx;
         this.items =items;
         this.worryOperator = worryOperator;
@@ -59,7 +59,7 @@ class Monkey {
     }
 
     public function getThrow(i:Int):Throw {
-        var nw = Math.floor(newWorry(i)/3);
+        var nw = newWorry(i);
         trace(nw);
         items.shift();
         var b = switch (nw%test==0) {
@@ -72,7 +72,7 @@ class Monkey {
         };
     }
 
-    function newWorry(i:Int):Int {
+    function newWorry(i:Int):UInt {
         inspections++;
         return switch ([this.worryOperation, this.worryOperator]) {
             case [Plus, Old]: items[i]+items[i];
@@ -102,16 +102,18 @@ class Main {
             input = parse.matchedRight();
         }
 
-        for (i in 0...20) {
+        for (i in 0...10000) {
             for (m in monkeys) {
                 while (m.items.length > 0) {
                     var t = m.getThrow(0);
                     monkeys[t.to].fetch(t);
                 }
             }
-            Log.trace('After round ${i+1}, the monkeys are holding items with these worry levels:');
-            for (m in monkeys) {
-                Log.trace('Monkey ${m.index}: ${m.itemsString()}');
+            if ((i+1)%1000==0) {
+                Log.trace('After round ${i+1}, the monkeys are holding items with these worry levels:');
+                for (m in monkeys) {
+                    Log.trace('Monkey ${m.index}: ${m.itemsString()}');
+                }
             }
         }
         var all = [];
@@ -140,7 +142,7 @@ class Main {
         }
     }
 
-    static function parseItems(str:String):Array<Int> {
+    static function parseItems(str:String):Array<UInt> {
         return [for (i in str.split(',')) Std.parseInt(i.trim())];
     }
 
