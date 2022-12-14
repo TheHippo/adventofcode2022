@@ -12,7 +12,7 @@ enum Operation {
 
 enum Operator {
     Old;
-    Value(v:Int);
+    Value(v:UInt);
 }
 
 typedef Throw = {
@@ -59,7 +59,7 @@ class Monkey {
     }
 
     public function getThrow(i:Int):Throw {
-        var nw = newWorry(i);
+        var nw = newWorry(i)%Main.breakFactor;
         trace(nw);
         items.shift();
         var b = switch (nw%test==0) {
@@ -85,6 +85,8 @@ class Monkey {
 
 class Main {
 
+    public static var breakFactor = 1;
+
     public static function main() {
         var parse = ~/Monkey\s(\d+):\s+Starting items:\s([0-9, ]+)\s+Operation:\snew = old ([*+])\s(old|\d+)\s+Test: divisible by (\d+)\s+If true: throw to monkey (\d+)\s+If false: throw to monkey (\d+)/gm;
         var input = Resource.getString("input");
@@ -99,10 +101,13 @@ class Main {
                 Std.parseInt(parse.matched(6)),
                 Std.parseInt(parse.matched(7))
             ));
+            breakFactor *= Std.parseInt(parse.matched(5));
             input = parse.matchedRight();
         }
+        // throw breakFactor;
 
         for (i in 0...10000) {
+            // Log.trace(i);
             for (m in monkeys) {
                 while (m.items.length > 0) {
                     var t = m.getThrow(0);
